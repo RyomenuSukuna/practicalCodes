@@ -1,46 +1,23 @@
-def printConfiguration(colorArray):
-    print("The assigned colors are as follows:")
-    for i in range(4):
-        print("Vertex:", i, "Color:", colorArray[i])
+def greedy_graph_coloring(graph):
+    colors = {}
+    available_colors = ["red", "blue", "green", "yellow"]  # Define the available color names
 
-def isSafe(graph, colorArray, vertex, color):
-   
-    for i in range(4):
-        if graph[vertex][i] and colorArray[i] == color:
-            return False
-    return True
+    for node in graph:
+        used_colors = set(colors.get(neighbor, None) for neighbor in graph[node])
+        for color in available_colors:
+            if color not in used_colors:
+                colors[node] = color
+                break
 
-def graphColoringAlgorithm(graph, m, vertex, colorArray):
-    
-    if vertex == 4:
-        printConfiguration(colorArray)
-        return True
+    return colors
 
-    
-    for color in range(1, m + 1):
-        if isSafe(graph, colorArray, vertex, color):
-            colorArray[vertex] = color
 
-           
-            if graphColoringAlgorithm(graph, m, vertex + 1, colorArray):
-                return True
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'C', 'D'],
+    'C': ['A', 'B', 'D'],
+    'D': ['B', 'C'],
+}
 
-           
-            colorArray[vertex] = 0
-
-    return False
-
-if __name__ == '__main__':
-    graph = [
-        [0, 1, 1, 1],
-        [1, 0, 1, 0],
-        [1, 1, 0, 1],
-        [1, 0, 1, 0],
-    ]
-    m = 3
-    colorArray = [0] * 4  
-
-    if graphColoringAlgorithm(graph, m, 0, colorArray):
-        print("Coloring is possible!")
-    else:
-        print("Coloring is not possible!")
+coloring = greedy_graph_coloring(graph)
+print(coloring)
