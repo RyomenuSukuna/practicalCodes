@@ -1,0 +1,100 @@
+import pandas as pd
+import numpy as np
+
+
+df = pd.read_csv(r"location with extension csv")
+
+
+df.head()
+
+
+df.info()
+
+
+df= df.drop(['Unnamed: 0', 'key'], axis= 1) #To drop unnamed column as it isn't␣
+↪required
+
+
+df.head(50)
+
+
+df.shape
+
+df.dtypes
+
+
+#Removing the null values
+df.isnull().sum()
+
+
+df['dropoff_latitude'].fillna(value=df['dropoff_latitude'].mean(),inplace= True)
+df['dropoff_longitude'].fillna(value=df['dropoff_longitude'].median(),inplace=␣
+↪True)
+
+
+df.isnull().sum()
+
+
+import matplotlib.pyplot as plt
+
+
+plt.boxplot(df['fare_amount'])
+plt.title("Box Plot of Fare Amount")
+plt.show()
+
+
+# Use IQR method to detect and remove outliers
+Q1 = df['fare_amount'].quantile(0.25)
+Q3 = df['fare_amount'].quantile(0.75)
+IQR = Q3 - Q1
+data = df[~((df['fare_amount'] < (Q1 - 1.5 * IQR)) | (df['fare_amount'] > (Q3 +␣
+↪1.5 * IQR)))] # Remove outliers
+
+
+X=␣
+↪df[['pickup_longitude','pickup_latitude','dropoff_longitude','dropoff_latitude','passenger_↪]]
+y= df['fare_amount']
+
+
+# Split the data into training and testing sets
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,␣
+↪random_state=42)
+
+
+# Train a Linear Regression model
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
+
+
+# Train a Random Forest Regression model
+rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+
+# 5. Evaluate the models and compare their respective scores
+# Make predictions
+lr_predictions = lr_model.predict(X_test)
+rf_predictions = rf_model.predict(X_test)
+
+
+from sklearn.metrics import r2_score, mean_squared_error
+from math import sqrt
+
+
+# Calculate R-squared (R2)
+lr_r2 = r2_score(y_test, lr_predictions)
+rf_r2 = r2_score(y_test, rf_predictions)
+
+
+# Calculate Root Mean Squared Error (RMSE)
+lr_rmse = sqrt(mean_squared_error(y_test, lr_predictions))
+rf_rmse = sqrt(mean_squared_error(y_test, rf_predictions))
+
+
+print("Linear Regression R2:", lr_r2)
+print("Random Forest Regression R2:", rf_r2)
+print("Linear Regression RMSE:", lr_rmse)
+print("Random Forest Regression RMSE:", rf_rmse)
